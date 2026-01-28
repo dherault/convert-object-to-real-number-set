@@ -1,68 +1,33 @@
-import { describe, it, expect } from '@jest/globals';
-import { convertObjectToRealNumberSet } from './index';
+import { describe, expect, it } from '@jest/globals'
 
-describe('convertObjectToRealNumberSet', () => {
-  it('should extract numeric values from an object', () => {
-    const input = { a: 1, b: 2, c: 3 };
-    const result = convertObjectToRealNumberSet(input);
-    expect(result).toEqual([1, 2, 3]);
-  });
+import { decodeRToNR, encodeNRToR } from './index'
 
-  it('should sort numeric values in ascending order', () => {
-    const input = { a: 3, b: 1, c: 2 };
-    const result = convertObjectToRealNumberSet(input);
-    expect(result).toEqual([1, 2, 3]);
-  });
+describe('encodeNRToR and decodeNRtoR', () => {
+  it('encodes', () => {
+    expect(typeof encodeNRToR(0, 0)).toBe('number')
+    expect(encodeNRToR(0, 0)).toBe(encodeNRToR(0, 0))
+    expect(encodeNRToR(0, 0)).not.toBe(encodeNRToR(1, 0))
+    expect(encodeNRToR(0, 0.5)).not.toBe(encodeNRToR(0, 0))
+    expect(encodeNRToR(1, 0.5)).not.toBe(encodeNRToR(1, 0))
+  })
 
-  it('should ignore non-numeric values', () => {
-    const input = { a: 1, b: 'string', c: 2, d: true, e: null };
-    const result = convertObjectToRealNumberSet(input);
-    expect(result).toEqual([1, 2]);
-  });
+  it('decodes', () => {
+    ;[
+      [0, 0],
+      [1, 0],
+      [2, 1],
+      [3, -1],
+      [10, 0.5],
+      [11, -0.5],
+      [123456, Math.PI],
+      [123457, -Math.PI],
+    ].forEach(([n, r]) => {
+      const encoded = encodeNRToR(n, r)
+      const decoded = decodeRToNR(encoded)
+      // console.log(n, r, encoded, decoded)
 
-  it('should return empty array for object with no numeric values', () => {
-    const input = { a: 'string', b: true, c: null };
-    const result = convertObjectToRealNumberSet(input);
-    expect(result).toEqual([]);
-  });
-
-  it('should return empty array for empty object', () => {
-    const input = {};
-    const result = convertObjectToRealNumberSet(input);
-    expect(result).toEqual([]);
-  });
-
-  it('should handle negative numbers', () => {
-    const input = { a: -5, b: 10, c: -2 };
-    const result = convertObjectToRealNumberSet(input);
-    expect(result).toEqual([-5, -2, 10]);
-  });
-
-  it('should handle floating point numbers', () => {
-    const input = { a: 1.5, b: 2.3, c: 0.1 };
-    const result = convertObjectToRealNumberSet(input);
-    expect(result).toEqual([0.1, 1.5, 2.3]);
-  });
-
-  it('should filter out NaN values', () => {
-    const input = { a: 1, b: NaN, c: 2 };
-    const result = convertObjectToRealNumberSet(input);
-    expect(result).toEqual([1, 2]);
-  });
-
-  it('should handle Infinity values', () => {
-    const input = { a: 1, b: Infinity, c: -Infinity, d: 5 };
-    const result = convertObjectToRealNumberSet(input);
-    expect(result).toEqual([-Infinity, 1, 5, Infinity]);
-  });
-
-  it('should handle zero', () => {
-    const input = { a: 0, b: -0, c: 1 };
-    const result = convertObjectToRealNumberSet(input);
-    expect(result).toHaveLength(3);
-    expect(result[2]).toBe(1);
-    // Both 0 and -0 are included, order depends on iteration
-    expect(result[0] + 1).toBe(1); // Verifies it's some form of zero
-    expect(result[1] + 1).toBe(1); // Verifies it's some form of zero
-  });
-});
+      expect(decoded.n).toBe(n)
+      expect(decoded.r).toBeCloseTo(r as number, 3)
+    })
+  })
+})

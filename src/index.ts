@@ -1,20 +1,23 @@
-/**
- * Converts an object to a real number set representation.
- * This is a proof of concept implementation.
- * 
- * Note: This function filters out NaN values and includes Infinity/-Infinity.
- */
-export function convertObjectToRealNumberSet(obj: Record<string, unknown>): number[] {
-  // For now, we'll extract numeric values from the object
-  const numbers: number[] = [];
-  
-  for (const value of Object.values(obj)) {
-    if (typeof value === 'number' && !isNaN(value)) {
-      numbers.push(value);
-    }
-  }
-  
-  return numbers.sort((a, b) => a - b);
+import type { Rn } from './types'
+
+export function encodeNRToR(n: number, r: number): number {
+  return n + Math.atan(r) / Math.PI + 1 / 2
 }
 
-export default convertObjectToRealNumberSet;
+export function decodeRToNR(value: number): { n: number, r: number } {
+  const n = Math.floor(value)
+  const r = Math.tan(Math.PI * ((value - n) - 1 / 2))
+
+  return { n, r }
+}
+
+export function encodeRn(rn: Rn): number[] {
+  const set: number[] = []
+  const max = Math.max(...rn)
+
+  rn.forEach((r, i) => {
+    set.push(r, max + encodeNRToR(i, r))
+  })
+
+  return set
+}
