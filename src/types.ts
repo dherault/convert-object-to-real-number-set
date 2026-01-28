@@ -1,3 +1,5 @@
-export type Rn = [number, number, number]
+export type Pair = { n: number, r: number }
 
-export type Unit = Map<Rn, Rn | Unit>
+export type Rn = number[]
+
+export type Unit = Map<Rn, Rn>
