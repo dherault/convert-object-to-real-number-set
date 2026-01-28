@@ -14,7 +14,7 @@
     "test:coverage": "jest --coverage",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
-    "clean": "rm -rf dist",
+    "clean": "rimraf dist",
     "prepublishOnly": "npm run clean && npm run build"
   },
   "keywords": [],
@@ -28,6 +28,7 @@
     "@types/node": "^25.0.10",
     "eslint": "^9.39.2",
     "jest": "^30.2.0",
+    "rimraf": "^6.1.2",
     "ts-jest": "^29.4.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.54.0"
