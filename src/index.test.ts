@@ -31,4 +31,38 @@ describe('convertObjectToRealNumberSet', () => {
     const result = convertObjectToRealNumberSet(input);
     expect(result).toEqual([]);
   });
+
+  it('should handle negative numbers', () => {
+    const input = { a: -5, b: 10, c: -2 };
+    const result = convertObjectToRealNumberSet(input);
+    expect(result).toEqual([-5, -2, 10]);
+  });
+
+  it('should handle floating point numbers', () => {
+    const input = { a: 1.5, b: 2.3, c: 0.1 };
+    const result = convertObjectToRealNumberSet(input);
+    expect(result).toEqual([0.1, 1.5, 2.3]);
+  });
+
+  it('should filter out NaN values', () => {
+    const input = { a: 1, b: NaN, c: 2 };
+    const result = convertObjectToRealNumberSet(input);
+    expect(result).toEqual([1, 2]);
+  });
+
+  it('should handle Infinity values', () => {
+    const input = { a: 1, b: Infinity, c: -Infinity, d: 5 };
+    const result = convertObjectToRealNumberSet(input);
+    expect(result).toEqual([-Infinity, 1, 5, Infinity]);
+  });
+
+  it('should handle zero', () => {
+    const input = { a: 0, b: -0, c: 1 };
+    const result = convertObjectToRealNumberSet(input);
+    expect(result).toHaveLength(3);
+    expect(result[2]).toBe(1);
+    // Both 0 and -0 are included, order depends on iteration
+    expect(result[0] + 1).toBe(1); // Verifies it's some form of zero
+    expect(result[1] + 1).toBe(1); // Verifies it's some form of zero
+  });
 });
